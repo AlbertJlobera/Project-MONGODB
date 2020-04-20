@@ -1,0 +1,647 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "from pymongo import MongoClient\n",
+    "import json, requests\n",
+    "import os\n",
+    "from dotenv import load_dotenv\n",
+    "load_dotenv()\n",
+    "import requests\n",
+    "from pandas.io.json import json_normalize\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Import companies from Mongodb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "mongodb://localhost/companies\n"
+     ]
+    }
+   ],
+   "source": [
+    "dbName = \"companies\"\n",
+    "mongodbURL = f\"mongodb://localhost/{dbName}\"\n",
+    "print(mongodbURL)\n",
+    "client = MongoClient(mongodbURL, connectTimeoutMS=2000,serverSelectionTimeoutMS=2000)\n",
+    "db = client.get_database()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## sort columns from offices"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "<ipython-input-3-8555aed50465>:2: FutureWarning: pandas.io.json.json_normalize is deprecated, use pandas.json_normalize instead\n",
+      "  df = pd.DataFrame(json_normalize(db))\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(16705, 12)\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>_id</th>\n",
+       "      <th>name</th>\n",
+       "      <th>category_code</th>\n",
+       "      <th>offices.description</th>\n",
+       "      <th>offices.address1</th>\n",
+       "      <th>offices.address2</th>\n",
+       "      <th>offices.zip_code</th>\n",
+       "      <th>offices.city</th>\n",
+       "      <th>offices.state_code</th>\n",
+       "      <th>offices.country_code</th>\n",
+       "      <th>offices.latitude</th>\n",
+       "      <th>offices.longitude</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>52cdef7c4bab8bd675297d8b</td>\n",
+       "      <td>AdventNet</td>\n",
+       "      <td>enterprise</td>\n",
+       "      <td>Headquarters</td>\n",
+       "      <td>4900 Hopyard Rd.</td>\n",
+       "      <td>Suite 310</td>\n",
+       "      <td>94588</td>\n",
+       "      <td>Pleasanton</td>\n",
+       "      <td>CA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>37.692934</td>\n",
+       "      <td>-121.904945</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>52cdef7c4bab8bd675297d8a</td>\n",
+       "      <td>Wetpaint</td>\n",
+       "      <td>web</td>\n",
+       "      <td></td>\n",
+       "      <td>710 - 2nd Avenue</td>\n",
+       "      <td>Suite 1100</td>\n",
+       "      <td>98104</td>\n",
+       "      <td>Seattle</td>\n",
+       "      <td>WA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>47.603122</td>\n",
+       "      <td>-122.333253</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>52cdef7c4bab8bd675297d8a</td>\n",
+       "      <td>Wetpaint</td>\n",
+       "      <td>web</td>\n",
+       "      <td></td>\n",
+       "      <td>270 Lafayette Street</td>\n",
+       "      <td>Suite 505</td>\n",
+       "      <td>10012</td>\n",
+       "      <td>New York</td>\n",
+       "      <td>NY</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>40.723731</td>\n",
+       "      <td>-73.996431</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>52cdef7c4bab8bd675297d8c</td>\n",
+       "      <td>Zoho</td>\n",
+       "      <td>software</td>\n",
+       "      <td>Headquarters</td>\n",
+       "      <td>4900 Hopyard Rd</td>\n",
+       "      <td>Suite 310</td>\n",
+       "      <td>94588</td>\n",
+       "      <td>Pleasanton</td>\n",
+       "      <td>CA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>37.692934</td>\n",
+       "      <td>-121.904945</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>52cdef7c4bab8bd675297d8d</td>\n",
+       "      <td>Digg</td>\n",
+       "      <td>news</td>\n",
+       "      <td>None</td>\n",
+       "      <td>135 Mississippi St</td>\n",
+       "      <td></td>\n",
+       "      <td>94107</td>\n",
+       "      <td>San Francisco</td>\n",
+       "      <td>CA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>37.764726</td>\n",
+       "      <td>-122.394523</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                        _id       name category_code offices.description  \\\n",
+       "0  52cdef7c4bab8bd675297d8b  AdventNet    enterprise        Headquarters   \n",
+       "1  52cdef7c4bab8bd675297d8a   Wetpaint           web                       \n",
+       "2  52cdef7c4bab8bd675297d8a   Wetpaint           web                       \n",
+       "3  52cdef7c4bab8bd675297d8c       Zoho      software        Headquarters   \n",
+       "4  52cdef7c4bab8bd675297d8d       Digg          news                None   \n",
+       "\n",
+       "       offices.address1 offices.address2 offices.zip_code   offices.city  \\\n",
+       "0      4900 Hopyard Rd.        Suite 310            94588     Pleasanton   \n",
+       "1      710 - 2nd Avenue       Suite 1100            98104        Seattle   \n",
+       "2  270 Lafayette Street        Suite 505            10012       New York   \n",
+       "3       4900 Hopyard Rd        Suite 310            94588     Pleasanton   \n",
+       "4    135 Mississippi St                             94107  San Francisco   \n",
+       "\n",
+       "  offices.state_code offices.country_code  offices.latitude  offices.longitude  \n",
+       "0                 CA                  USA         37.692934        -121.904945  \n",
+       "1                 WA                  USA         47.603122        -122.333253  \n",
+       "2                 NY                  USA         40.723731         -73.996431  \n",
+       "3                 CA                  USA         37.692934        -121.904945  \n",
+       "4                 CA                  USA         37.764726        -122.394523  "
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "db = list(db.companies.aggregate([{\"$unwind\":\"$offices\"},{\"$project\":{\"offices\":1,\"name\":1,\"category_code\":1}}]))\n",
+    "df = pd.DataFrame(json_normalize(db))\n",
+    "print(df.shape)\n",
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Droping columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_gaming = df\n",
+    "df_gaming.drop(df_gaming[df_gaming.category_code != \"games_video\"].index, axis=0, inplace=True)\n",
+    "df_gaming = df_gaming.drop(['_id'], axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "New York         75\n",
+       "San Francisco    68\n",
+       "                 54\n",
+       "Name: offices.city, dtype: int64"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_gaming.dropna(subset = ['offices.city'])\n",
+    "df_gaming.shape\n",
+    "df_gaming[\"offices.city\"].value_counts().head(3)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>name</th>\n",
+       "      <th>category_code</th>\n",
+       "      <th>offices.description</th>\n",
+       "      <th>offices.address1</th>\n",
+       "      <th>offices.address2</th>\n",
+       "      <th>offices.zip_code</th>\n",
+       "      <th>offices.city</th>\n",
+       "      <th>offices.state_code</th>\n",
+       "      <th>offices.country_code</th>\n",
+       "      <th>offices.latitude</th>\n",
+       "      <th>offices.longitude</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>4740</th>\n",
+       "      <td>Overstream</td>\n",
+       "      <td>games_video</td>\n",
+       "      <td></td>\n",
+       "      <td>235 Montgomery St.</td>\n",
+       "      <td>Suite 600</td>\n",
+       "      <td>94104</td>\n",
+       "      <td>San Francisco</td>\n",
+       "      <td>CA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>37.791391</td>\n",
+       "      <td>-122.402859</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            name category_code offices.description    offices.address1  \\\n",
+       "4740  Overstream   games_video                      235 Montgomery St.   \n",
+       "\n",
+       "     offices.address2 offices.zip_code   offices.city offices.state_code  \\\n",
+       "4740        Suite 600            94104  San Francisco                 CA   \n",
+       "\n",
+       "     offices.country_code  offices.latitude  offices.longitude  \n",
+       "4740                  USA         37.791391        -122.402859  "
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Save file as companiesgame_clean"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_gaming.to_json(\"../companiesgame_clean.json\",orient=\"records\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Cleaning dataset to get only the design companies"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "mongodb://localhost/companies\n"
+     ]
+    }
+   ],
+   "source": [
+    "dbName = \"companies\"\n",
+    "mongodbURL = f\"mongodb://localhost/{dbName}\"\n",
+    "print(mongodbURL)\n",
+    "client = MongoClient(mongodbURL, connectTimeoutMS=2000,serverSelectionTimeoutMS=2000)\n",
+    "db = client.get_database()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "<ipython-input-8-175ff8ac3aaf>:2: FutureWarning: pandas.io.json.json_normalize is deprecated, use pandas.json_normalize instead\n",
+      "  df = pd.DataFrame(json_normalize(db))\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(16705, 12)\n"
+     ]
+    }
+   ],
+   "source": [
+    "db = list(db.companies.aggregate([{\"$unwind\":\"$offices\"},{\"$project\":{\"offices\":1,\"name\":1,\"category_code\":1}}]))\n",
+    "df = pd.DataFrame(json_normalize(db))\n",
+    "print(df.shape)\n",
+    "df.head()\n",
+    "df_design = df\n",
+    "df_design.drop(df_design[df_design.category_code != \"design\"].index, axis=0, inplace=True)\n",
+    "df_design = df_design.drop(['_id'], axis=1)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>name</th>\n",
+       "      <th>category_code</th>\n",
+       "      <th>offices.description</th>\n",
+       "      <th>offices.address1</th>\n",
+       "      <th>offices.address2</th>\n",
+       "      <th>offices.zip_code</th>\n",
+       "      <th>offices.city</th>\n",
+       "      <th>offices.state_code</th>\n",
+       "      <th>offices.country_code</th>\n",
+       "      <th>offices.latitude</th>\n",
+       "      <th>offices.longitude</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2023</th>\n",
+       "      <td>99designs</td>\n",
+       "      <td>design</td>\n",
+       "      <td>United States (HQ)</td>\n",
+       "      <td>447 Battery St.</td>\n",
+       "      <td>3rd Floor</td>\n",
+       "      <td>94111</td>\n",
+       "      <td>San Francisco</td>\n",
+       "      <td>CA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>37.795531</td>\n",
+       "      <td>-122.400598</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13928</th>\n",
+       "      <td>Graticle</td>\n",
+       "      <td>design</td>\n",
+       "      <td>Office</td>\n",
+       "      <td>100 E. Third Ave. #373</td>\n",
+       "      <td></td>\n",
+       "      <td>98926</td>\n",
+       "      <td>Ellensburg</td>\n",
+       "      <td>WA</td>\n",
+       "      <td>USA</td>\n",
+       "      <td>45.796841</td>\n",
+       "      <td>-122.693144</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            name category_code offices.description        offices.address1  \\\n",
+       "2023   99designs        design  United States (HQ)         447 Battery St.   \n",
+       "13928   Graticle        design              Office  100 E. Third Ave. #373   \n",
+       "\n",
+       "      offices.address2 offices.zip_code   offices.city offices.state_code  \\\n",
+       "2023         3rd Floor            94111  San Francisco                 CA   \n",
+       "13928                             98926     Ellensburg                 WA   \n",
+       "\n",
+       "      offices.country_code  offices.latitude  offices.longitude  \n",
+       "2023                   USA         37.795531        -122.400598  \n",
+       "13928                  USA         45.796841        -122.693144  "
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_design.dropna()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Concat both DataFrames"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Getting DataFrame 'result' from 'df_gaming' and 'df_design'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "result = pd.concat([df_gaming, df_design], ignore_index=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(962, 11)"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Saveing file as companies_one"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "result.to_json(\"input/companies_one.json\",orient=\"records\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Tableau result:\n",
+    "\n",
+    "[https://public.tableau.com/profile/albert8801#!/vizhome/company_clean/Hoja2?publish=yes]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "final_location = df_gaming[df_gaming.name  ==\"Overstream\"]\n",
+    "\n",
+    "def finallocation(data):\n",
+    "    return{\n",
+    "        'Address':list(final_location['offices.address1']),\n",
+    "        'Postal Code':list(final_location['offices.zip_code']),\n",
+    "        'City':list(final_location['offices.city']),\n",
+    "        'Latitude':list(final_location['offices.latitude']),\n",
+    "        'Longitude':list(final_location['offices.longitude'])\n",
+    "        \n",
+    "    }\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'Address': ['235 Montgomery St.'],\n",
+       " 'Postal Code': ['94104'],\n",
+       " 'City': ['San Francisco'],\n",
+       " 'Latitude': [37.791391],\n",
+       " 'Longitude': [-122.402859]}"
+      ]
+     },
+     "execution_count": 46,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "finallocation(final_location)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
