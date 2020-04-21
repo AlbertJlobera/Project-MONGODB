@@ -8,8 +8,21 @@
    "source": [
     "import requests\n",
     "import pandas as pd\n",
-    "from bs4 import BeautifulSoup\n",
-    "res = requests.get(\"https://www.northeastern.edu/graduate/blog/tech-companies-san-francisco-bay-area/\")"
+    "from bs4 import BeautifulSoup\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Web Scrap"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Scraping from www.northeastern.edu the best companies in Financial District in san Francisco."
    ]
   },
   {
@@ -18,8 +31,9 @@
    "metadata": {},
    "outputs": [],
    "source": [
+    "res = requests.get(\"https://www.northeastern.edu/graduate/blog/tech-companies-san-francisco-bay-area/\")\n",
     "res.text\n",
-    "soup = BeautifulSoup(res.text)\n"
+    "soup = BeautifulSoup(res.text)"
    ]
   },
   {
@@ -90,6 +104,13 @@
    ],
    "source": [
     "getcompanies(tables)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Scraping from https://en.wikipedia.org some of important companies in San Francisco."
    ]
   },
   {
@@ -201,6 +222,13 @@
     "        name[5].text : [comp[51].text,'-','-','-','-','-'],\n",
     "        name[6].text : [comp[52].text,comp[53].text,'-','-','-','-']\n",
     "    }"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Companies table about different sector in San Francisco"
    ]
   },
   {
@@ -328,7 +356,6 @@
     }
    ],
    "source": [
-    "\n",
     "companies_in_SF = pd.DataFrame(scrap())\n",
     "companies_in_SF"
    ]

@@ -2,13 +2,6 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
    "execution_count": 1,
    "metadata": {},
    "outputs": [],
@@ -24,11 +17,19 @@
    ]
   },
   {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Use Foursquare api to get locations."
+   ]
+  },
+  {
    "cell_type": "code",
    "execution_count": 2,
    "metadata": {},
    "outputs": [],
    "source": [
+    "# Function to request all we need to satisfy our employees\n",
     "\n",
     "def getapi(search):\n",
     "    url = 'https://api.foursquare.com/v2/venues/explore'\n",
@@ -200,13 +201,6 @@
     "df2 = getapi('Starbucks')\n",
     "df2"
    ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": []
   },
   {
    "cell_type": "code",
@@ -563,7 +557,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 14,
+   "execution_count": 10,
    "metadata": {},
    "outputs": [
     {
@@ -717,29 +711,34 @@
        "6 -122.386110  "
       ]
      },
-     "execution_count": 14,
+     "execution_count": 10,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
+    "#Concat all dataframes to result.\n",
+    "\n",
     "result = pd.concat([df1, df2, df3,df4,df5,df6,df7], ignore_index=True)\n",
     "result"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 15,
+   "execution_count": 14,
    "metadata": {},
    "outputs": [],
    "source": [
+    "# add miter to column 'Distance'\n",
     "result['Distance'] = result['Distance'].apply(lambda x: str(x) + ' miters')"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 16,
-   "metadata": {},
+   "execution_count": 12,
+   "metadata": {
+    "scrolled": true
+   },
    "outputs": [
     {
      "data": {
@@ -892,7 +891,7 @@
        "6 -122.386110  "
       ]
      },
-     "execution_count": 16,
+     "execution_count": 12,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -902,12 +901,28 @@
    ]
   },
   {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Saving api results:"
+   ]
+  },
+  {
    "cell_type": "code",
-   "execution_count": 17,
+   "execution_count": 13,
    "metadata": {},
    "outputs": [],
    "source": [
     "result.to_json(\"input/employee_needs.json\",orient=\"records\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Tableau result:\n",
+    "\n",
+    "[https://public.tableau.com/profile/albert8801#!/vizhome/employee_needs/Hoja1?publish=yes]\n"
    ]
   }
  ],
